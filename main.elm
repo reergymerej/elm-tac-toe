@@ -1,37 +1,85 @@
 module Main exposing (..)
 
 import Html
+import Html.Events
+
+
+type SquareValue
+    = Unset
+    | X
+    | O
 
 
 type alias Model =
-    { done : Bool }
+    { done : Bool
+    , value : SquareValue
+    }
 
 
 model : Model
 model =
-    { done = False }
+    { done = False
+    , value = Unset
+    }
 
 
 type Message
-    = Boop
+    = ChangeValue String
+    | RotateSquareValue
 
 
 type alias View =
     Html.Html Message
 
 
-view : model -> Html.Html Message
+getSquareText : SquareValue -> String
+getSquareText value =
+    case value of
+        Unset ->
+            "[-]"
+
+        X ->
+            "X"
+
+        O ->
+            "O"
+
+
+renderSquare : SquareValue -> View
+renderSquare value =
+    Html.div [] [ Html.text (getSquareText value) ]
+
+
+view : Model -> View
 view model =
-    Html.div [] [ Html.text "hi" ]
+    Html.div
+        [ Html.Events.onClick RotateSquareValue
+        ]
+        [ renderSquare model.value
+        ]
 
 
-update : msg -> model -> model
+nextSquareValue : SquareValue -> SquareValue
+nextSquareValue value =
+    case value of
+        Unset ->
+            X
+
+        X ->
+            O
+
+        O ->
+            Unset
+
+
+update : Message -> Model -> Model
 update message model =
-    model
+    case message of
+        ChangeValue value ->
+            model
 
-
-
--- { model : model, view : model -> Html msg, update : msg -> model -> model }
+        RotateSquareValue ->
+            { model | value = nextSquareValue model.value }
 
 
 main : Program Never Model Message
